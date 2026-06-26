@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: aditshoplog-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-aditshoplog}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-aditshoplog}
+      POSTGRES_DB: ${POSTGRES_DB:-aditshoplog}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-aditshoplog} -d ${POSTGRES_DB:-aditshoplog}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
