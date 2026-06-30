@@ -3,6 +3,7 @@ import { env } from '../config/env';
 
 export const pool = new Pool({
   connectionString: env.databaseUrl,
+  options: '-c timezone=Asia/Seoul',
 });
 
 export async function query<T extends QueryResultRow = QueryResultRow>(

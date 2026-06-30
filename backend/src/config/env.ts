@@ -12,6 +12,16 @@ function requireEnv(key: string, fallback?: string): string {
   return value;
 }
 
+const DEFAULT_DEV_ORIGINS = ['http://localhost:3000', 'http://localhost:3001'];
+
+function parseCorsOrigins(): string[] {
+  const configured = (process.env.CORS_ORIGIN ?? '')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+  return Array.from(new Set([...configured, ...DEFAULT_DEV_ORIGINS]));
+}
+
 export const env = {
   port: Number(process.env.PORT ?? 4000),
   databaseUrl: requireEnv(
@@ -20,6 +30,6 @@ export const env = {
   ),
   jwtSecret: requireEnv('JWT_SECRET', 'dev-secret-change-in-production'),
   jwtExpiresIn: process.env.JWT_EXPIRES_IN ?? '7d',
-  corsOrigin: process.env.CORS_ORIGIN ?? 'http://localhost:3000',
+  corsOrigin: parseCorsOrigins(),
   nodeEnv: process.env.NODE_ENV ?? 'development',
 };

@@ -45,12 +45,4 @@ export interface RemarkListResponse {
   data: Remark[];
 }
 
-export function formatDate(value: string | null) {
-  if (!value) return '-';
-  return value.slice(0, 10);
-}
-
-export function formatDateTime(value: string | null) {
-  if (!value) return '-';
-  return value.replace('T', ' ').slice(0, 16);
-}
+export { formatDate, formatDateTime } from '@/lib/date';

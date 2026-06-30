@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { apiFetch } from '@/lib/api';
+import { TICKET_STATUS_OPTIONS } from '@/constants/ticketOptions';
 import { formatDate, formatDateTime, type TicketListResponse } from '@/types/ticket';
 import styles from '@/styles/shared.module.css';
 
@@ -72,10 +73,17 @@ export default function TicketsPage() {
         </div>
         <div className={styles.field}>
           <label>처리현황</label>
-          <input
+          <select
             value={filters.status}
             onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-          />
+          >
+            <option value="">전체</option>
+            {TICKET_STATUS_OPTIONS.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
         </div>
         <div className={styles.field}>
           <label>담당자</label>

@@ -9,6 +9,8 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-aditshoplog}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-aditshoplog}
       POSTGRES_DB: ${POSTGRES_DB:-aditshoplog}
+      TZ: Asia/Seoul
+      PGTZ: Asia/Seoul
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:

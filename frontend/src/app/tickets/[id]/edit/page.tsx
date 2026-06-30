@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { FormEvent, useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { apiFetch } from '@/lib/api';
+import { toDateInputValue } from '@/lib/date';
+import { DEV_MERGE_OPTIONS, TICKET_STATUS_OPTIONS } from '@/constants/ticketOptions';
 import { type Ticket } from '@/types/ticket';
 import styles from '@/styles/shared.module.css';
 
@@ -24,8 +26,8 @@ export default function EditTicketPage() {
           jira_key: ticket.jira_key,
           ticket_name: ticket.ticket_name,
           assignee: ticket.assignee ?? '',
-          written_date: ticket.written_date ?? '',
-          deploy_date: ticket.deploy_date ?? '',
+          written_date: toDateInputValue(ticket.written_date),
+          deploy_date: toDateInputValue(ticket.deploy_date),
           aditshop_branch_note: ticket.aditshop_branch_note ?? '',
           newbqr_branch_note: ticket.newbqr_branch_note ?? '',
           related_links: ticket.related_links ?? '',
@@ -81,9 +83,6 @@ export default function EditTicketPage() {
           ['assignee', '담당자'],
           ['written_date', '작성일자'],
           ['deploy_date', '배포일'],
-          ['status', '처리현황'],
-          ['dev_merge_status', 'dev merge'],
-          ['capture_upload_status', '캡처 업로드'],
         ].map(([key, label]) => (
           <div className={styles.field} key={key}>
             <label>{label}</label>
@@ -95,6 +94,39 @@ export default function EditTicketPage() {
             />
           </div>
         ))}
+
+        <div className={styles.field}>
+          <label>처리현황</label>
+          <select value={form.status ?? ''} onChange={(e) => updateField('status', e.target.value)}>
+            <option value="">선택</option>
+            {TICKET_STATUS_OPTIONS.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className={styles.field}>
+          <label>dev merge</label>
+          <select
+            value={form.dev_merge_status ?? ''}
+            onChange={(e) => updateField('dev_merge_status', e.target.value)}
+          >
+            <option value="">선택</option>
+            {DEV_MERGE_OPTIONS.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className={styles.field}>
+          <label>캡처 업로드</label>
+          <input
+            value={form.capture_upload_status ?? ''}
+            onChange={(e) => updateField('capture_upload_status', e.target.value)}
+          />
+        </div>
 
         {[
           ['aditshop_branch_note', 'aditshop repo 브랜치 업로드'],

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiFetch } from '@/lib/api';
+import { DEV_MERGE_OPTIONS, TICKET_STATUS_OPTIONS } from '@/constants/ticketOptions';
 import { type Ticket } from '@/types/ticket';
 import styles from '@/styles/shared.module.css';
 
@@ -120,14 +121,28 @@ export default function NewTicketPage() {
         </div>
         <div className={styles.field}>
           <label>처리현황</label>
-          <input value={form.status} onChange={(e) => updateField('status', e.target.value)} />
+          <select value={form.status} onChange={(e) => updateField('status', e.target.value)}>
+            <option value="">선택</option>
+            {TICKET_STATUS_OPTIONS.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
         </div>
         <div className={styles.field}>
           <label>dev merge</label>
-          <input
+          <select
             value={form.dev_merge_status}
             onChange={(e) => updateField('dev_merge_status', e.target.value)}
-          />
+          >
+            <option value="">선택</option>
+            {DEV_MERGE_OPTIONS.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
         </div>
         <div className={styles.field}>
           <label>캡처 업로드</label>

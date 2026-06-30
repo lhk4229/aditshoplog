@@ -3,6 +3,7 @@ import jwt, { SignOptions } from 'jsonwebtoken';
 import { env } from '../config/env';
 import { AUTH_COOKIE_NAME } from '../lib/cookie';
 import { AppError } from './errorHandler';
+import { query } from '../db/pool';
 
 export interface AuthPayload {
   userId: number;
@@ -32,7 +33,7 @@ function extractToken(req: Request): string | null {
   return null;
 }
 
-export function authenticate(req: Request, _res: Response, next: NextFunction) {
+export async function authenticate(req: Request, _res: Response, next: NextFunction) {
   const token = extractToken(req);
 
   if (!token) {
@@ -41,6 +42,14 @@ export function authenticate(req: Request, _res: Response, next: NextFunction) {
 
   try {
     const payload = jwt.verify(token, env.jwtSecret) as AuthPayload;
+
+    const result = await query<{ id: number }>('SELECT id FROM users WHERE id = $1', [
+      payload.userId,
+    ]);
+    if (result.rows.length === 0) {
+      return next(new AppError(401, 'Invalid or expired token'));
+    }
+
     req.user = payload;
     next();
   } catch {
