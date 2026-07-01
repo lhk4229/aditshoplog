@@ -119,7 +119,7 @@ export default function TicketsPage() {
               <th>처리현황</th>
               <th>dev merge</th>
               <th>캡처 업로드</th>
-              <th>최근 수정</th>
+              {/* <th>최근 수정</th> */}
               <th>관리</th>
             </tr>
           </thead>
@@ -138,11 +138,11 @@ export default function TicketsPage() {
                 <td>{ticket.status ?? '-'}</td>
                 <td>{ticket.dev_merge_status ?? '-'}</td>
                 <td>{ticket.capture_upload_status ?? '-'}</td>
-                <td>
+                {/* <td>
                   {ticket.last_modified_by_name
                     ? `${ticket.last_modified_by_name} / ${formatDateTime(ticket.last_modified_at)}`
                     : '-'}
-                </td>
+                </td> */}
                 <td>
                   <div className={styles.actions}>
                     <Link href={`/tickets/${ticket.id}/edit`} className={styles.linkButton}>

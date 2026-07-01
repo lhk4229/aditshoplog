@@ -4,7 +4,13 @@ import Link from 'next/link';
 import { FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiFetch } from '@/lib/api';
-import { DEV_MERGE_OPTIONS, TICKET_STATUS_OPTIONS } from '@/constants/ticketOptions';
+import { todayInKst } from '@/lib/date';
+import {
+  CAPTURE_UPLOAD_OPTIONS,
+  DEFAULT_CAPTURE_UPLOAD_STATUS,
+  DEV_MERGE_OPTIONS,
+  TICKET_STATUS_OPTIONS,
+} from '@/constants/ticketOptions';
 import { type Ticket } from '@/types/ticket';
 import styles from '@/styles/shared.module.css';
 
@@ -12,14 +18,14 @@ const emptyForm = {
   jira_key: '',
   ticket_name: '',
   assignee: '',
-  written_date: '',
+  written_date: todayInKst(),
   deploy_date: '',
   aditshop_branch_note: '',
   newbqr_branch_note: '',
   related_links: '',
   status: '',
   dev_merge_status: '',
-  capture_upload_status: '',
+  capture_upload_status: DEFAULT_CAPTURE_UPLOAD_STATUS,
 };
 
 export default function NewTicketPage() {
@@ -62,55 +68,61 @@ export default function NewTicketPage() {
       <form className={styles.detailGrid} onSubmit={handleSubmit}>
         {error && <div className={styles.error}>{error}</div>}
 
-        <div className={styles.field}>
-          <label>지라번호 *</label>
-          <input
-            value={form.jira_key}
-            onChange={(e) => updateField('jira_key', e.target.value)}
-            required
-          />
+        <div className={`${styles.fieldRow} ${styles.fieldRow2}`}>
+          <div className={styles.field}>
+            <label>지라번호 *</label>
+            <input
+              value={form.jira_key}
+              onChange={(e) => updateField('jira_key', e.target.value)}
+              required
+            />
+          </div>
+          <div className={styles.field}>
+            <label>티켓명 *</label>
+            <input
+              value={form.ticket_name}
+              onChange={(e) => updateField('ticket_name', e.target.value)}
+              required
+            />
+          </div>
         </div>
-        <div className={styles.field}>
-          <label>티켓명 *</label>
-          <input
-            value={form.ticket_name}
-            onChange={(e) => updateField('ticket_name', e.target.value)}
-            required
-          />
+        <div className={`${styles.fieldRow} ${styles.fieldRow3}`}>
+          <div className={styles.field}>
+            <label>담당자</label>
+            <input value={form.assignee} onChange={(e) => updateField('assignee', e.target.value)} />
+          </div>
+          <div className={styles.field}>
+            <label>작성일자</label>
+            <input
+              type="date"
+              value={form.written_date}
+              onChange={(e) => updateField('written_date', e.target.value)}
+            />
+          </div>
+          <div className={styles.field}>
+            <label>배포일</label>
+            <input
+              type="date"
+              value={form.deploy_date}
+              onChange={(e) => updateField('deploy_date', e.target.value)}
+            />
+          </div>
         </div>
-        <div className={styles.field}>
-          <label>담당자</label>
-          <input value={form.assignee} onChange={(e) => updateField('assignee', e.target.value)} />
-        </div>
-        <div className={styles.field}>
-          <label>작성일자</label>
-          <input
-            type="date"
-            value={form.written_date}
-            onChange={(e) => updateField('written_date', e.target.value)}
-          />
-        </div>
-        <div className={styles.field}>
-          <label>배포일</label>
-          <input
-            type="date"
-            value={form.deploy_date}
-            onChange={(e) => updateField('deploy_date', e.target.value)}
-          />
-        </div>
-        <div className={styles.field}>
-          <label>aditshop repo 브랜치 업로드</label>
-          <textarea
-            value={form.aditshop_branch_note}
-            onChange={(e) => updateField('aditshop_branch_note', e.target.value)}
-          />
-        </div>
-        <div className={styles.field}>
-          <label>newbqr repo 브랜치 업로드</label>
-          <textarea
-            value={form.newbqr_branch_note}
-            onChange={(e) => updateField('newbqr_branch_note', e.target.value)}
-          />
+        <div className={`${styles.fieldRow} ${styles.fieldRow2}`}>
+          <div className={styles.field}>
+            <label>aditshop repo 브랜치 업로드</label>
+            <textarea
+              value={form.aditshop_branch_note}
+              onChange={(e) => updateField('aditshop_branch_note', e.target.value)}
+            />
+          </div>
+          <div className={styles.field}>
+            <label>newbqr repo 브랜치 업로드</label>
+            <textarea
+              value={form.newbqr_branch_note}
+              onChange={(e) => updateField('newbqr_branch_note', e.target.value)}
+            />
+          </div>
         </div>
         <div className={styles.field}>
           <label>관련 파일 및 링크</label>
@@ -119,37 +131,45 @@ export default function NewTicketPage() {
             onChange={(e) => updateField('related_links', e.target.value)}
           />
         </div>
-        <div className={styles.field}>
-          <label>처리현황</label>
-          <select value={form.status} onChange={(e) => updateField('status', e.target.value)}>
-            <option value="">선택</option>
-            {TICKET_STATUS_OPTIONS.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className={styles.field}>
-          <label>dev merge</label>
-          <select
-            value={form.dev_merge_status}
-            onChange={(e) => updateField('dev_merge_status', e.target.value)}
-          >
-            <option value="">선택</option>
-            {DEV_MERGE_OPTIONS.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className={styles.field}>
-          <label>캡처 업로드</label>
-          <input
-            value={form.capture_upload_status}
-            onChange={(e) => updateField('capture_upload_status', e.target.value)}
-          />
+        <div className={`${styles.fieldRow} ${styles.fieldRow3}`}>
+          <div className={styles.field}>
+            <label>처리현황</label>
+            <select value={form.status} onChange={(e) => updateField('status', e.target.value)}>
+              <option value="">선택</option>
+              {TICKET_STATUS_OPTIONS.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className={styles.field}>
+            <label>dev merge</label>
+            <select
+              value={form.dev_merge_status}
+              onChange={(e) => updateField('dev_merge_status', e.target.value)}
+            >
+              <option value="">선택</option>
+              {DEV_MERGE_OPTIONS.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className={styles.field}>
+            <label>캡처 업로드</label>
+            <select
+              value={form.capture_upload_status}
+              onChange={(e) => updateField('capture_upload_status', e.target.value)}
+            >
+              {CAPTURE_UPLOAD_OPTIONS.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         <button type="submit" className={styles.button} disabled={loading}>
