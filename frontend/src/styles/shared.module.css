@@ -127,7 +127,7 @@
   padding: 12px 14px;
   border-bottom: 1px solid #e5e7eb;
   text-align: left;
-  font-size: 0.9rem;
+  font-size: 0.75rem;
 }
 
 .table th {
@@ -138,6 +138,29 @@
 
 .table tr:hover td {
   background: #f9fafb;
+}
+
+.table td {
+  vertical-align: middle;
+}
+
+.table .actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.table .linkButton,
+.table .dangerButton {
+  font-size: inherit;
+  line-height: inherit;
+  font-weight: 600;
+}
+
+.table .dangerButton {
+  padding: 0;
+  margin: 0;
+  font-family: inherit;
 }
 
 .actions {

@@ -114,8 +114,9 @@ export default function TicketsPage() {
               <th>작성일자</th>
               <th>담당자</th>
               <th>배포일</th>
-              <th>지라번호</th>
-              <th>티켓명</th>
+              <th>티켓</th>
+              <th>aditshop repo</th>
+              <th>newbqr repo</th>
               <th>처리현황</th>
               <th>dev merge</th>
               <th>캡처 업로드</th>
@@ -131,10 +132,11 @@ export default function TicketsPage() {
                 <td>{formatDate(ticket.deploy_date)}</td>
                 <td>
                   <Link href={`/tickets/${ticket.id}`} className={styles.linkButton}>
-                    {ticket.jira_key}
+                    [{ticket.jira_key}] {ticket.ticket_name}
                   </Link>
                 </td>
-                <td>{ticket.ticket_name}</td>
+                <td>{ticket.aditshop_branch_note ?? '-'}</td>
+                <td>{ticket.newbqr_branch_note ?? '-'}</td>
                 <td>{ticket.status ?? '-'}</td>
                 <td>{ticket.dev_merge_status ?? '-'}</td>
                 <td>{ticket.capture_upload_status ?? '-'}</td>
@@ -161,7 +163,7 @@ export default function TicketsPage() {
             ))}
             {data?.data.length === 0 && (
               <tr>
-                <td colSpan={10} style={{ textAlign: 'center', padding: '32px' }}>
+                <td colSpan={12} style={{ textAlign: 'center', padding: '32px' }}>
                   등록된 티켓이 없습니다.
                 </td>
               </tr>
