@@ -23,7 +23,7 @@ function cookieMaxAgeSeconds(): number {
 export function setAuthCookie(res: Response, token: string) {
   res.cookie(AUTH_COOKIE_NAME, token, {
     httpOnly: true,
-    secure: env.nodeEnv === 'production',
+    secure: env.cookieSecure,
     sameSite: 'lax',
     path: '/',
     maxAge: cookieMaxAgeSeconds() * 1000,
@@ -33,7 +33,7 @@ export function setAuthCookie(res: Response, token: string) {
 export function clearAuthCookie(res: Response) {
   res.clearCookie(AUTH_COOKIE_NAME, {
     httpOnly: true,
-    secure: env.nodeEnv === 'production',
+    secure: env.cookieSecure,
     sameSite: 'lax',
     path: '/',
   });
