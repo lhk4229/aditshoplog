@@ -2,9 +2,13 @@ const KST = 'Asia/Seoul';
 const LOCALE = 'ko-KR';
 
 function parseDateOnly(value: string): Date | null {
-  const datePart = value.slice(0, 10);
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(datePart)) return null;
-  return new Date(`${datePart}T00:00:00+09:00`);
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return new Date(`${value}T00:00:00+09:00`);
+  }
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  return date;
 }
 
 export function formatDate(value: string | null) {
@@ -32,11 +36,10 @@ export function formatDateTime(value: string | null) {
 /** HTML date input용 YYYY-MM-DD (KST 기준) */
 export function toDateInputValue(value: string | null) {
   if (!value) return '';
-  const dateOnly = parseDateOnly(value);
-  if (dateOnly) return value.slice(0, 10);
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return value;
 
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return '';
+  const date = parseDateOnly(value);
+  if (!date) return '';
 
   return date.toLocaleDateString('sv-SE', { timeZone: KST });
 }

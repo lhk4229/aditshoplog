@@ -33,7 +33,7 @@ export default function SignupPage() {
   return (
     <div className={styles.card}>
       <h1 className={styles.title}>회원가입</h1>
-      <p className={styles.subtitle}>AditShopLog 계정을 만듭니다</p>
+      <p className={styles.subtitle}>Aditshoplog 계정을 만듭니다</p>
       <form className={styles.form} onSubmit={handleSubmit}>
         {error && <div className={styles.error}>{error}</div>}
         <div className={styles.field}>

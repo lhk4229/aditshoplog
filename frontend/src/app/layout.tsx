@@ -12,7 +12,7 @@ const notoSansKr = Noto_Sans_KR({
 });
 
 export const metadata: Metadata = {
-  title: 'AditShopLog',
+  title: 'Aditshoplog',
   description: '업무 티켓 처리 현황 관리',
 };
 

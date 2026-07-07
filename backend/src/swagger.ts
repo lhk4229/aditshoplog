@@ -5,9 +5,9 @@ export const swaggerSpec = swaggerJsdoc({
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'AditShopLog API',
+      title: 'Aditshoplog API',
       version: '1.0.0',
-      description: 'AditShopLog 업무 티켓 관리 API',
+      description: 'Aditshoplog 업무 티켓 관리 API',
     },
     servers: [{ url: `http://localhost:${env.port}` }],
     components: {

@@ -8,7 +8,8 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    # AWS Secrets 미설정 시 배포 건너뜀 (CI는 별도 workflow에서 실행)
+    if: github.ref == 'refs/heads/main' && secrets.AWS_HOST != '' && secrets.AWS_SSH_KEY != ''
 
     steps:
       - name: Deploy via SSH
@@ -19,7 +20,8 @@ jobs:
           key: ${{ secrets.AWS_SSH_KEY }}
           script: |
             set -e
-            cd ${{ secrets.AWS_APP_DIR || '~/aditshoplog' }}
+            APP_DIR="${{ secrets.AWS_APP_DIR }}"
+            cd "${APP_DIR:-$HOME/aditshoplog}"
             git pull origin main
             docker compose -f docker-compose.prod.yml --env-file .env up -d --build
             docker image prune -f

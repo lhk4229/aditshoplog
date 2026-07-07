@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-echo "==> AditShopLog AWS server setup (Ubuntu)"
+echo "==> Aditshoplog AWS server setup (Ubuntu)"
 
 sudo apt-get update
 sudo apt-get install -y ca-certificates curl git

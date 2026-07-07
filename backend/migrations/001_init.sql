@@ -1,4 +1,4 @@
--- AditShopLog initial schema
+-- Aditshoplog initial schema
 
 CREATE TABLE IF NOT EXISTS users (
   id SERIAL PRIMARY KEY,

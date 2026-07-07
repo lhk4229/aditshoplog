@@ -32,7 +32,7 @@ export default function LoginPage() {
   return (
     <div className={styles.card}>
       <h1 className={styles.title}>로그인</h1>
-      <p className={styles.subtitle}>AditShopLog 업무 티켓 관리</p>
+      <p className={styles.subtitle}>Aditshoplog 업무 티켓 관리</p>
       <form className={styles.form} onSubmit={handleSubmit}>
         {error && <div className={styles.error}>{error}</div>}
         <div className={styles.field}>

@@ -19,7 +19,7 @@ export function Header() {
   return (
     <header className={styles.header}>
       <Link href="/tickets" className={styles.logo}>
-        AditShopLog
+        Aditshoplog
       </Link>
       <nav className={styles.nav}>
         {user ? (
