@@ -8,11 +8,25 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    # AWS Secrets 미설정 시 배포 건너뜀 (CI는 별도 workflow에서 실행)
-    if: github.ref == 'refs/heads/main' && secrets.AWS_HOST != '' && secrets.AWS_SSH_KEY != ''
+    if: github.ref == 'refs/heads/main'
 
     steps:
+      # job if에서는 secrets 사용 불가 → step에서 검사
+      - name: Check AWS secrets
+        id: guard
+        env:
+          AWS_HOST: ${{ secrets.AWS_HOST }}
+          AWS_SSH_KEY: ${{ secrets.AWS_SSH_KEY }}
+        run: |
+          if [ -z "$AWS_HOST" ] || [ -z "$AWS_SSH_KEY" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::AWS secrets not configured — deploy skipped"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Deploy via SSH
+        if: steps.guard.outputs.skip != 'true'
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.AWS_HOST }}
