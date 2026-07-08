@@ -79,7 +79,7 @@ export default function TicketDetailPage() {
   }
 
   if (error) return <div className={styles.error}>{error}</div>;
-  if (!ticket) return <p>불러오는 중...</p>;
+  if (!ticket) return <p className={styles.loading}>불러오는 중...</p>;
 
   return (
     <div>
@@ -89,7 +89,7 @@ export default function TicketDetailPage() {
           <Link href={`/tickets/${id}/edit`} className={styles.buttonSecondary}>
             수정
           </Link>
-          <button type="button" className={styles.dangerButton} onClick={handleDeleteTicket}>
+          <button type="button" className={styles.buttonDanger} onClick={handleDeleteTicket}>
             삭제
           </button>
         </div>

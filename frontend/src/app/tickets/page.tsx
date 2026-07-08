@@ -162,10 +162,8 @@ export default function TicketsPage() {
               </tr>
             ))}
             {data?.data.length === 0 && (
-              <tr>
-                <td colSpan={12} style={{ textAlign: 'center', padding: '32px' }}>
-                  등록된 티켓이 없습니다.
-                </td>
+              <tr className={styles.emptyRow}>
+                <td colSpan={12}>등록된 티켓이 없습니다.</td>
               </tr>
             )}
           </tbody>

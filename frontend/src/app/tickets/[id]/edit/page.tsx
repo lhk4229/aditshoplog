@@ -76,7 +76,7 @@ export default function EditTicketPage() {
       <div className={styles.pageHeader}>
         <h1>티켓 수정</h1>
         <Link href={`/tickets/${id}`} className={styles.buttonSecondary}>
-          상세로
+          상세
         </Link>
       </div>
 

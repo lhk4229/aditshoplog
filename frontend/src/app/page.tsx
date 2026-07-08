@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { fetchCurrentUser } from '@/lib/api';
+import styles from '@/styles/shared.module.css';
 
 export default function HomePage() {
   useEffect(() => {
@@ -10,5 +11,5 @@ export default function HomePage() {
     });
   }, []);
 
-  return <p>이동 중...</p>;
+  return <p className={styles.loading}>이동 중...</p>;
 }

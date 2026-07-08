@@ -1,3 +1,24 @@
+:root {
+  --nw-accent: #3182f6;
+  --nw-accent-hover: #1b64da;
+  --nw-accent-light: #e8f3ff;
+  --nw-bg: #f5f6f8;
+  --nw-surface: #ffffff;
+  --nw-text: #222222;
+  --nw-text-secondary: #767676;
+  --nw-text-tertiary: #999999;
+  --nw-border: #e1e1e1;
+  --nw-border-dark: #d0d0d0;
+  --nw-red: #e53935;
+  --nw-red-hover: #c62828;
+  --nw-red-light: #fdecea;
+  --nw-blue: #1a73e8;
+  --nw-radius: 4px;
+  --nw-radius-md: 6px;
+  --nw-btn-height: 36px;
+  --nw-btn-height-lg: 44px;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -6,14 +27,32 @@ html,
 body {
   margin: 0;
   padding: 0;
-  font-family: var(--font-noto-sans), 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #f4f6f8;
-  color: #1f2937;
+  font-family: var(--font-noto-sans), 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  background: var(--nw-bg);
+  color: var(--nw-text);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
 }
 
 input,
 textarea,
 select,
 button {
-  font-family: var(--font-noto-sans), 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: inherit;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+a {
+  color: var(--nw-accent);
 }

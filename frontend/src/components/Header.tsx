@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { fetchCurrentUser, logout, type AuthUser } from '@/lib/api';
+import sharedStyles from '@/styles/shared.module.css';
 import styles from './Header.module.css';
 
 export function Header() {
@@ -19,7 +20,7 @@ export function Header() {
   return (
     <header className={styles.header}>
       <Link href="/tickets" className={styles.logo}>
-        Aditshoplog
+        Adit<span className={styles.logoAccent}>shop</span>log
       </Link>
       <nav className={styles.nav}>
         {user ? (
@@ -27,7 +28,7 @@ export function Header() {
             <span className={styles.user}>{user.name}님</span>
             <Link href="/tickets">티켓 목록</Link>
             <Link href="/tickets/new">티켓 등록</Link>
-            <button type="button" onClick={handleLogout} className={styles.logout}>
+            <button type="button" onClick={handleLogout} className={sharedStyles.buttonSecondary}>
               로그아웃
             </button>
           </>
