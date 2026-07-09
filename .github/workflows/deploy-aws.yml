@@ -34,7 +34,6 @@ jobs:
           port: 22
           timeout: 60s
           command_timeout: 30m
-          script_stderr: true
           script: |
             set -euo pipefail
             APP_DIR="${{ secrets.AWS_APP_DIR }}"
