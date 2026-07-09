@@ -9,8 +9,13 @@ if [ ! -f ".env" ]; then
   exit 1
 fi
 
+mkdir -p ~/.ssh
+chmod 700 ~/.ssh
+ssh-keyscan -t ed25519,rsa github.com >> ~/.ssh/known_hosts 2>/dev/null || true
+
 echo "==> Pull latest code"
-git pull origin main
+git fetch origin main
+git reset --hard origin/main
 
 echo "==> Build and start containers"
 docker compose -f docker-compose.prod.yml --env-file .env up -d --build

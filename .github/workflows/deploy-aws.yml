@@ -34,6 +34,7 @@ jobs:
           port: 22
           timeout: 60s
           command_timeout: 30m
+          debug: true
           script: |
             set -euo pipefail
             APP_DIR="${{ secrets.AWS_APP_DIR }}"
@@ -44,7 +45,7 @@ jobs:
             if [ ! -d "$APP_DIR" ]; then
               echo "ERROR: $APP_DIR not found."
               echo "On the server, run:"
-              echo "  git clone https://github.com/lhk4229/aditshoplog.git ~/aditshoplog"
+              echo "  git clone git@github.com:lhk4229/aditshoplog.git ~/aditshoplog"
               echo "  cd ~/aditshoplog && ./deploy/setup-server.sh"
               exit 1
             fi
@@ -63,14 +64,24 @@ jobs:
               exit 1
             fi
 
+            if ! docker info >/dev/null 2>&1; then
+              echo "ERROR: docker permission denied. Run: sudo usermod -aG docker $USER && re-login"
+              exit 1
+            fi
+
+            mkdir -p ~/.ssh
+            chmod 700 ~/.ssh
+            ssh-keyscan -t ed25519,rsa github.com >> ~/.ssh/known_hosts 2>/dev/null || true
+
             echo "==> Pull latest code"
-            git pull origin main
+            git fetch origin main
+            git reset --hard origin/main
 
             echo "==> Build and start containers"
-            docker compose -f docker-compose.prod.yml --env-file .env up -d --build
+            docker compose -f docker-compose.prod.yml --env-file .env up -d --build 2>&1
 
             echo "==> Prune unused images"
-            docker image prune -f
+            docker image prune -f 2>&1
 
             echo "==> Deploy complete"
-            docker compose -f docker-compose.prod.yml ps
+            docker compose -f docker-compose.prod.yml ps 2>&1
