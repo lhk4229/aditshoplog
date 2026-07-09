@@ -11,7 +11,6 @@ jobs:
     if: github.ref == 'refs/heads/main'
 
     steps:
-      # job if에서는 secrets 사용 불가 → step에서 검사
       - name: Check AWS secrets
         id: guard
         env:
@@ -30,12 +29,49 @@ jobs:
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.AWS_HOST }}
-          username: ${{ secrets.AWS_USER }}
+          username: ${{ secrets.AWS_USER != '' && secrets.AWS_USER || 'ubuntu' }}
           key: ${{ secrets.AWS_SSH_KEY }}
+          port: 22
+          timeout: 60s
+          command_timeout: 30m
+          script_stderr: true
           script: |
-            set -e
+            set -euo pipefail
             APP_DIR="${{ secrets.AWS_APP_DIR }}"
-            cd "${APP_DIR:-$HOME/aditshoplog}"
+            APP_DIR="${APP_DIR:-$HOME/aditshoplog}"
+
+            echo "==> Deploy target: $APP_DIR"
+
+            if [ ! -d "$APP_DIR" ]; then
+              echo "ERROR: $APP_DIR not found."
+              echo "On the server, run:"
+              echo "  git clone https://github.com/lhk4229/aditshoplog.git ~/aditshoplog"
+              echo "  cd ~/aditshoplog && ./deploy/setup-server.sh"
+              exit 1
+            fi
+
+            cd "$APP_DIR"
+
+            if [ ! -f ".env" ]; then
+              echo "ERROR: $APP_DIR/.env not found."
+              echo "On the server, run:"
+              echo "  cp deploy/.env.production.example .env && nano .env"
+              exit 1
+            fi
+
+            if ! command -v docker >/dev/null 2>&1; then
+              echo "ERROR: docker not installed. Run ./deploy/setup-server.sh on the server."
+              exit 1
+            fi
+
+            echo "==> Pull latest code"
             git pull origin main
+
+            echo "==> Build and start containers"
             docker compose -f docker-compose.prod.yml --env-file .env up -d --build
+
+            echo "==> Prune unused images"
             docker image prune -f
+
+            echo "==> Deploy complete"
+            docker compose -f docker-compose.prod.yml ps
