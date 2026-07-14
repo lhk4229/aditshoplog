@@ -146,9 +146,18 @@ export default function TicketDetailPage() {
               placeholder="진행 메모를 입력하세요"
             />
           </div>
-          <button type="submit" className={styles.button}>
-            리마크 등록
-          </button>
+          <div className={styles.formActions}>
+            <button
+              type="button"
+              className={styles.buttonSecondary}
+              onClick={() => setRemarkContent('')}
+            >
+              취소
+            </button>
+            <button type="submit" className={styles.button}>
+              리마크 등록
+            </button>
+          </div>
         </form>
       </section>
     </div>
