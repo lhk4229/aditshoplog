@@ -263,6 +263,21 @@
   gap: 6px;
 }
 
+.formActions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+.formActions .button,
+.formActions .buttonSecondary {
+  margin-top: 0;
+  height: var(--nw-btn-height);
+  font-size: 13px;
+  font-weight: 500;
+}
+
 .toolbar {
   display: flex;
   flex-wrap: wrap;

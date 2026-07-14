@@ -172,9 +172,14 @@ export default function NewTicketPage() {
           </div>
         </div>
 
-        <button type="submit" className={styles.button} disabled={loading}>
-          {loading ? '등록 중...' : '등록'}
-        </button>
+        <div className={styles.formActions}>
+          <Link href="/tickets" className={styles.buttonSecondary}>
+            취소
+          </Link>
+          <button type="submit" className={styles.button} disabled={loading}>
+            {loading ? '등록 중...' : '등록'}
+          </button>
+        </div>
       </form>
     </div>
   );
