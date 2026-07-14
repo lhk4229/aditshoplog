@@ -179,9 +179,14 @@ export default function EditTicketPage() {
           />
         </div>
 
-        <button type="submit" className={styles.button} disabled={loading}>
-          {loading ? '저장 중...' : '저장'}
-        </button>
+        <div className={styles.formActions}>
+          <Link href="/tickets" className={styles.buttonSecondary}>
+            취소
+          </Link>
+          <button type="submit" className={styles.button} disabled={loading}>
+            {loading ? '저장 중...' : '저장'}
+          </button>
+        </div>
       </form>
     </div>
   );
