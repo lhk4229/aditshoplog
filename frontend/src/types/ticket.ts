@@ -19,6 +19,7 @@ export interface Ticket {
   last_modified_at: string | null;
   created_at: string;
   updated_at: string;
+  latest_remark_content?: string | null;
 }
 
 export interface TicketListResponse {

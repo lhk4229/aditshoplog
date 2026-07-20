@@ -28,6 +28,7 @@ interface TicketRow {
   last_modified_at: string | null;
   created_at: string;
   updated_at: string;
+  latest_remark_content?: string | null;
 }
 
 function buildTicketTitle(jiraKey: string, ticketName: string) {
@@ -56,6 +57,7 @@ function mapTicket(row: TicketRow) {
     last_modified_at: row.last_modified_at,
     created_at: row.created_at,
     updated_at: row.updated_at,
+    latest_remark_content: row.latest_remark_content ?? null,
   };
 }
 
@@ -144,7 +146,20 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
 
     params.push(limit, offset);
     const listResult = await query<TicketRow>(
-      `${ticketSelect}
+      `SELECT
+         t.*,
+         w.name AS writer_name,
+         lm.name AS last_modified_by_name,
+         (
+           SELECT r.content
+           FROM remarks r
+           WHERE r.ticket_id = t.id
+           ORDER BY r.created_at DESC, r.id DESC
+           LIMIT 1
+         ) AS latest_remark_content
+       FROM tickets t
+       JOIN users w ON w.id = t.writer_id
+       LEFT JOIN users lm ON lm.id = t.last_modified_by
        ${whereClause}
        ORDER BY t.created_at DESC
        LIMIT $${params.length - 1} OFFSET $${params.length}`,

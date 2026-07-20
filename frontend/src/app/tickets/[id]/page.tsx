@@ -217,13 +217,9 @@ export default function TicketDetailPage() {
             />
           </div>
           <div className={styles.formActions}>
-            <button
-              type="button"
-              className={styles.buttonSecondary}
-              onClick={() => setRemarkContent('')}
-            >
-              취소
-            </button>
+            <Link href="/tickets" className={styles.buttonSecondary}>
+              목록
+            </Link>
             <button type="submit" className={styles.button}>
               리마크 등록
             </button>

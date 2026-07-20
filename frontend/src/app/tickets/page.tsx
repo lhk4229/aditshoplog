@@ -117,6 +117,7 @@ export default function TicketsPage() {
               <th>티켓</th>
               <th>aditshop repo</th>
               <th>newbqr repo</th>
+              <th>최신 리마크</th>
               <th>처리현황</th>
               <th>dev merge</th>
               <th>캡처 업로드</th>
@@ -137,6 +138,9 @@ export default function TicketsPage() {
                 </td>
                 <td>{ticket.aditshop_branch_note ?? '-'}</td>
                 <td>{ticket.newbqr_branch_note ?? '-'}</td>
+                <td className={styles.remarkCell}>
+                  {ticket.latest_remark_content ?? '-'}
+                </td>
                 <td>{ticket.status ?? '-'}</td>
                 <td>{ticket.dev_merge_status ?? '-'}</td>
                 <td>{ticket.capture_upload_status ?? '-'}</td>
@@ -163,7 +167,7 @@ export default function TicketsPage() {
             ))}
             {data?.data.length === 0 && (
               <tr className={styles.emptyRow}>
-                <td colSpan={12}>등록된 티켓이 없습니다.</td>
+                <td colSpan={11}>등록된 티켓이 없습니다.</td>
               </tr>
             )}
           </tbody>

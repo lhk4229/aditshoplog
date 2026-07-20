@@ -213,7 +213,7 @@
 .table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 960px;
+  min-width: 1100px;
 }
 
 .table th,
@@ -254,6 +254,15 @@
 .table .linkButton,
 .table .dangerButton {
   font-size: 13px;
+}
+
+.table .remarkCell {
+  max-width: 360px;
+  min-width: 220px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--nw-text-secondary);
 }
 
 /* ── Layout helpers ── */
