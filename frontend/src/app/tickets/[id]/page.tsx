@@ -21,6 +21,8 @@ export default function TicketDetailPage() {
   const [ticket, setTicket] = useState<Ticket | null>(null);
   const [remarks, setRemarks] = useState<Remark[]>([]);
   const [remarkContent, setRemarkContent] = useState('');
+  const [editingRemarkId, setEditingRemarkId] = useState<number | null>(null);
+  const [editContent, setEditContent] = useState('');
   const [error, setError] = useState('');
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
 
@@ -58,10 +60,38 @@ export default function TicketDetailPage() {
     }
   }
 
+  function startRemarkEdit(remark: Remark) {
+    setEditingRemarkId(remark.id);
+    setEditContent(remark.content);
+  }
+
+  function cancelRemarkEdit() {
+    setEditingRemarkId(null);
+    setEditContent('');
+  }
+
+  async function handleRemarkUpdate(e: FormEvent) {
+    e.preventDefault();
+    if (editingRemarkId === null || !editContent.trim()) return;
+
+    try {
+      await apiFetch(`/api/remarks/${editingRemarkId}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ content: editContent }),
+      });
+      setEditingRemarkId(null);
+      setEditContent('');
+      loadAll();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : '리마크 수정에 실패했습니다.');
+    }
+  }
+
   async function handleRemarkDelete(remarkId: number) {
     if (!confirm('리마크를 삭제하시겠습니까?')) return;
     try {
       await apiFetch(`/api/remarks/${remarkId}`, { method: 'DELETE' });
+      if (editingRemarkId === remarkId) cancelRemarkEdit();
       loadAll();
     } catch (err) {
       alert(err instanceof Error ? err.message : '삭제에 실패했습니다.');
@@ -117,25 +147,65 @@ export default function TicketDetailPage() {
 
       <section className={styles.remarkList}>
         <h2>리마크</h2>
-        {remarks.map((remark) => (
-          <div key={remark.id} className={styles.remarkItem}>
-            <div className={styles.remarkMeta}>
-              <span>
-                {remark.author_name} · {formatDateTime(remark.created_at)}
-              </span>
-              {currentUser?.id === remark.author_id && (
-                <button
-                  type="button"
-                  className={styles.dangerButton}
-                  onClick={() => handleRemarkDelete(remark.id)}
-                >
-                  삭제
-                </button>
+        {remarks.map((remark) => {
+          const isOwner = currentUser?.id === remark.author_id;
+          const isEditing = editingRemarkId === remark.id;
+
+          return (
+            <div key={remark.id} className={styles.remarkItem}>
+              <div className={styles.remarkMeta}>
+                <span>
+                  {remark.author_name} · {formatDateTime(remark.created_at)}
+                  {remark.updated_at !== remark.created_at &&
+                    ` · 수정 ${formatDateTime(remark.updated_at)}`}
+                </span>
+                {isOwner && !isEditing && (
+                  <div className={styles.remarkActions}>
+                    <button
+                      type="button"
+                      className={styles.linkButton}
+                      onClick={() => startRemarkEdit(remark)}
+                    >
+                      수정
+                    </button>
+                    <button
+                      type="button"
+                      className={styles.dangerButton}
+                      onClick={() => handleRemarkDelete(remark.id)}
+                    >
+                      삭제
+                    </button>
+                  </div>
+                )}
+              </div>
+              {isEditing ? (
+                <form className={styles.form} onSubmit={handleRemarkUpdate}>
+                  <div className={styles.field}>
+                    <textarea
+                      value={editContent}
+                      onChange={(e) => setEditContent(e.target.value)}
+                      autoFocus
+                    />
+                  </div>
+                  <div className={styles.formActions}>
+                    <button
+                      type="button"
+                      className={styles.buttonSecondary}
+                      onClick={cancelRemarkEdit}
+                    >
+                      취소
+                    </button>
+                    <button type="submit" className={styles.button}>
+                      저장
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <div>{remark.content}</div>
               )}
             </div>
-            <div>{remark.content}</div>
-          </div>
-        ))}
+          );
+        })}
 
         <form className={styles.form} onSubmit={handleRemarkSubmit}>
           <div className={styles.field}>
