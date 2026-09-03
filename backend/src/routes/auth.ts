@@ -44,11 +44,11 @@ router.post('/signup', async (req: Request, res: Response, next: NextFunction) =
     };
 
     if (!email?.trim() || !password || !name?.trim()) {
-      throw new AppError(400, 'email, password, name are required');
+      throw new AppError(400, '이메일, 비밀번호, 이름을 모두 입력해 주세요.');
     }
 
     if (password.length < 6) {
-      throw new AppError(400, 'Password must be at least 6 characters');
+      throw new AppError(400, '비밀번호는 6자 이상이어야 합니다.');
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
@@ -74,7 +74,7 @@ router.post('/signup', async (req: Request, res: Response, next: NextFunction) =
     });
   } catch (error) {
     if ((error as { code?: string }).code === '23505') {
-      next(new AppError(409, 'Email already registered'));
+      next(new AppError(409, '이미 등록된 이메일입니다.'));
       return;
     }
     next(error);
@@ -109,7 +109,7 @@ router.post('/login', async (req: Request, res: Response, next: NextFunction) =>
     };
 
     if (!email?.trim() || !password) {
-      throw new AppError(400, 'email and password are required');
+      throw new AppError(400, '이메일과 비밀번호를 입력해 주세요.');
     }
 
     const result = await query<UserRow>(
@@ -119,12 +119,12 @@ router.post('/login', async (req: Request, res: Response, next: NextFunction) =>
 
     const user = result.rows[0];
     if (!user) {
-      throw new AppError(401, 'Invalid email or password');
+      throw new AppError(401, '이메일 또는 비밀번호가 올바르지 않습니다.');
     }
 
     const valid = await bcrypt.compare(password, user.password_hash);
     if (!valid) {
-      throw new AppError(401, 'Invalid email or password');
+      throw new AppError(401, '이메일 또는 비밀번호가 올바르지 않습니다.');
     }
 
     const token = signToken({
@@ -158,7 +158,7 @@ router.post('/login', async (req: Request, res: Response, next: NextFunction) =>
 router.get('/me', authenticate, async (req: Request, res: Response, next: NextFunction) => {
   try {
     if (!req.user) {
-      throw new AppError(401, 'Authentication required');
+      throw new AppError(401, '로그인이 필요합니다.');
     }
 
     res.json({

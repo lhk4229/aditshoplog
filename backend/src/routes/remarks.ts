@@ -51,11 +51,11 @@ router.get(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const ticketId = Number(req.params.ticketId);
-      if (Number.isNaN(ticketId)) throw new AppError(400, 'Invalid ticket id');
+      if (Number.isNaN(ticketId)) throw new AppError(400, '올바르지 않은 티켓 ID입니다.');
 
       const ticket = await query('SELECT id FROM tickets WHERE id = $1', [ticketId]);
       if (ticket.rows.length === 0) {
-        throw new AppError(404, 'Ticket not found');
+        throw new AppError(404, '티켓을 찾을 수 없습니다.');
       }
 
       const result = await query<RemarkRow>(
@@ -95,19 +95,19 @@ router.post(
   '/tickets/:ticketId/remarks',
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      if (!req.user) throw new AppError(401, 'Authentication required');
+      if (!req.user) throw new AppError(401, '로그인이 필요합니다.');
 
       const ticketId = Number(req.params.ticketId);
-      if (Number.isNaN(ticketId)) throw new AppError(400, 'Invalid ticket id');
+      if (Number.isNaN(ticketId)) throw new AppError(400, '올바르지 않은 티켓 ID입니다.');
 
       const { content } = req.body as { content?: string };
       if (!content?.trim()) {
-        throw new AppError(400, 'content is required');
+        throw new AppError(400, '내용을 입력해 주세요.');
       }
 
       const ticket = await query('SELECT id FROM tickets WHERE id = $1', [ticketId]);
       if (ticket.rows.length === 0) {
-        throw new AppError(404, 'Ticket not found');
+        throw new AppError(404, '티켓을 찾을 수 없습니다.');
       }
 
       const result = await query<RemarkRow>(
@@ -148,14 +148,14 @@ router.post(
  */
 router.patch('/remarks/:id', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    if (!req.user) throw new AppError(401, 'Authentication required');
+    if (!req.user) throw new AppError(401, '로그인이 필요합니다.');
 
     const id = Number(req.params.id);
-    if (Number.isNaN(id)) throw new AppError(400, 'Invalid remark id');
+    if (Number.isNaN(id)) throw new AppError(400, '올바르지 않은 리마크 ID입니다.');
 
     const { content } = req.body as { content?: string };
     if (!content?.trim()) {
-      throw new AppError(400, 'content is required');
+      throw new AppError(400, '내용을 입력해 주세요.');
     }
 
     const existing = await query<{ author_id: number }>(
@@ -164,11 +164,11 @@ router.patch('/remarks/:id', async (req: Request, res: Response, next: NextFunct
     );
 
     if (existing.rows.length === 0) {
-      throw new AppError(404, 'Remark not found');
+      throw new AppError(404, '리마크를 찾을 수 없습니다.');
     }
 
     if (existing.rows[0].author_id !== req.user.userId) {
-      throw new AppError(403, 'You can only edit your own remarks');
+      throw new AppError(403, '본인이 작성한 리마크만 수정할 수 있습니다.');
     }
 
     const result = await query<RemarkRow>(
@@ -209,10 +209,10 @@ router.patch('/remarks/:id', async (req: Request, res: Response, next: NextFunct
  */
 router.delete('/remarks/:id', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    if (!req.user) throw new AppError(401, 'Authentication required');
+    if (!req.user) throw new AppError(401, '로그인이 필요합니다.');
 
     const id = Number(req.params.id);
-    if (Number.isNaN(id)) throw new AppError(400, 'Invalid remark id');
+    if (Number.isNaN(id)) throw new AppError(400, '올바르지 않은 리마크 ID입니다.');
 
     const existing = await query<{ author_id: number }>(
       'SELECT author_id FROM remarks WHERE id = $1',
@@ -220,11 +220,11 @@ router.delete('/remarks/:id', async (req: Request, res: Response, next: NextFunc
     );
 
     if (existing.rows.length === 0) {
-      throw new AppError(404, 'Remark not found');
+      throw new AppError(404, '리마크를 찾을 수 없습니다.');
     }
 
     if (existing.rows[0].author_id !== req.user.userId) {
-      throw new AppError(403, 'You can only delete your own remarks');
+      throw new AppError(403, '본인이 작성한 리마크만 삭제할 수 있습니다.');
     }
 
     await query('DELETE FROM remarks WHERE id = $1', [id]);

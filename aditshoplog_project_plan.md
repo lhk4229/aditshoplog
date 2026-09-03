@@ -51,7 +51,7 @@ Aditshoplog는 구글시트로 관리하던 업무 티켓 처리 현황을 웹 �
 
 ### Deployment
 
-- **AWS Lightsail** (Ubuntu + Docker Compose)
+- **AWS EC2** (Ubuntu + Docker Compose)
 - nginx 리버스 프록시 (80 → frontend/backend)
 - GitHub Actions (CI + SSH 배포)
 
@@ -398,7 +398,7 @@ flowchart TD
 | 5 | 완료 | Next.js, API 클라이언트, Header |
 | 6 | 완료 | login, signup, redirect |
 | 7 | 완료 | tickets 목록·등록·상세·수정 |
-| 8 | 진행 중 | AWS 배포 파일 추가, Lightsail 서버 생성·Secrets 설정 필요 |
+| 8 | 진행 중 | AWS 배포 파일 추가, EC2 서버·Secrets 설정 필요 |
 
 ---
 
@@ -416,16 +416,16 @@ flowchart LR
 
 | 구성요소 | 설명 |
 |---------|------|
-| **AWS Lightsail** | Ubuntu 인스턴스 ($10~20/월) |
+| **AWS EC2** | Ubuntu 인스턴스 + Docker Compose |
 | **Docker Compose** | postgres + backend + frontend + nginx |
 | **GitHub Actions** | `main` push 시 SSH로 자동 배포 |
 
-### 1단계 — Lightsail 인스턴스 생성
+### 1단계 — EC2 인스턴스 생성
 
-1. [AWS Lightsail](https://lightsail.aws.amazon.com/) → **Create instance**
-2. OS: **Ubuntu 22.04**, 플랜: **$10/월 (1GB RAM)** 이상
-3. 네트워킹: HTTP(80) 포트 허용
-4. SSH 키 다운로드 (`.pem`)
+1. [EC2 Console](https://console.aws.amazon.com/ec2/) → **Launch instance**
+2. AMI: **Ubuntu 22.04 LTS**, 인스턴스 타입: 필요 사양에 맞게 선택 (예: `t3.small` 이상)
+3. Security Group: HTTP(80), HTTPS(443), SSH(22) 인바운드 허용
+4. 키 페어 (`.pem`) 생성·다운로드
 
 ### 2단계 — 서버 초기 설정
 
@@ -452,7 +452,7 @@ Repository → Settings → Secrets → Actions:
 
 | Secret | 값 |
 |--------|-----|
-| `AWS_HOST` | Lightsail 퍼블릭 IP |
+| `AWS_HOST` | EC2 퍼블릭 IP (또는 Elastic IP) |
 | `AWS_USER` | `ubuntu` |
 | `AWS_SSH_KEY` | SSH private key 전체 내용 |
 | `AWS_APP_DIR` | `/home/ubuntu/aditshoplog` (선택) |
@@ -461,8 +461,8 @@ Repository → Settings → Secrets → Actions:
 
 ### 4단계 — HTTPS (선택)
 
-도메인 연결 후 Certbot 또는 Lightsail Load Balancer + SSL 인증서 적용.  
-nginx `443` 설정 추가 필요.
+현재는 EC2 앞 ALB 없이, Docker Compose의 **nginx**가 직접 HTTP(80)를 받습니다.  
+도메인을 연결한 뒤 HTTPS가 필요하면 같은 EC2에서 **Certbot**으로 인증서를 발급하고, nginx에 `443` 리스너를 추가하면 됩니다.
 
 ### 로컬 프로덕션 테스트
 
@@ -475,10 +475,10 @@ npm run prod:up
 - 접속: http://localhost
 - Swagger: http://localhost/api-docs
 
-### 향후 확장 (선택)
+<!-- ### 향후 확장 (선택)
 
 - DB를 **Amazon RDS PostgreSQL**로 분리
-- 이미지를 **Amazon ECR**에 push 후 EC2에서 pull
-- 로그·모니터링: **CloudWatch**
+- 이미지를 **Amazon ECR**에 push 후 EC2에서 pull (현재는 서버에서 Docker Compose 빌드)
+- 로그·모니터링: **CloudWatch** -->
 
 > 구현 진행 시 위 표의 상태·비고를 이 문서에 계속 갱신합니다.

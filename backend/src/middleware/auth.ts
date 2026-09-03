@@ -37,7 +37,7 @@ export async function authenticate(req: Request, _res: Response, next: NextFunct
   const token = extractToken(req);
 
   if (!token) {
-    return next(new AppError(401, 'Authentication required'));
+    return next(new AppError(401, '로그인이 필요합니다.'));
   }
 
   try {
@@ -47,13 +47,13 @@ export async function authenticate(req: Request, _res: Response, next: NextFunct
       payload.userId,
     ]);
     if (result.rows.length === 0) {
-      return next(new AppError(401, 'Invalid or expired token'));
+      return next(new AppError(401, '유효하지 않거나 만료된 토큰입니다.'));
     }
 
     req.user = payload;
     next();
   } catch {
-    next(new AppError(401, 'Invalid or expired token'));
+    next(new AppError(401, '유효하지 않거나 만료된 토큰입니다.'));
   }
 }
 

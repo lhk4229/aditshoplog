@@ -20,9 +20,9 @@ export function errorHandler(
   }
 
   console.error(err);
-  return res.status(500).json({ message: 'Internal server error' });
+  return res.status(500).json({ message: '서버 오류가 발생했습니다.' });
 }
 
 export function notFoundHandler(_req: Request, res: Response) {
-  res.status(404).json({ message: 'Not found' });
+  res.status(404).json({ message: '요청한 경로를 찾을 수 없습니다.' });
 }

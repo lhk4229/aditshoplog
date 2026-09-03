@@ -196,7 +196,7 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
  */
 router.post('/', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    if (!req.user) throw new AppError(401, 'Authentication required');
+    if (!req.user) throw new AppError(401, '로그인이 필요합니다.');
 
     const {
       jira_key,
@@ -213,7 +213,7 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
     } = req.body as Record<string, string | undefined>;
 
     if (!jira_key?.trim() || !ticket_name?.trim()) {
-      throw new AppError(400, 'jira_key and ticket_name are required');
+      throw new AppError(400, 'Jira 키와 티켓명을 입력해 주세요.');
     }
 
     const title = buildTicketTitle(jira_key.trim(), ticket_name.trim());
@@ -280,7 +280,7 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
 router.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const id = Number(req.params.id);
-    if (Number.isNaN(id)) throw new AppError(400, 'Invalid ticket id');
+    if (Number.isNaN(id)) throw new AppError(400, '올바르지 않은 티켓 ID입니다.');
 
     const result = await query<TicketRow>(
       `${ticketSelect} WHERE t.id = $1`,
@@ -288,7 +288,7 @@ router.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
     );
 
     if (result.rows.length === 0) {
-      throw new AppError(404, 'Ticket not found');
+      throw new AppError(404, '티켓을 찾을 수 없습니다.');
     }
 
     res.json(mapTicket(result.rows[0]));
@@ -316,10 +316,10 @@ router.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
  */
 router.patch('/:id', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    if (!req.user) throw new AppError(401, 'Authentication required');
+    if (!req.user) throw new AppError(401, '로그인이 필요합니다.');
 
     const id = Number(req.params.id);
-    if (Number.isNaN(id)) throw new AppError(400, 'Invalid ticket id');
+    if (Number.isNaN(id)) throw new AppError(400, '올바르지 않은 티켓 ID입니다.');
 
     const existing = await query<{ id: number; jira_key: string; ticket_name: string }>(
       'SELECT id, jira_key, ticket_name FROM tickets WHERE id = $1',
@@ -327,7 +327,7 @@ router.patch('/:id', async (req: Request, res: Response, next: NextFunction) => 
     );
 
     if (existing.rows.length === 0) {
-      throw new AppError(404, 'Ticket not found');
+      throw new AppError(404, '티켓을 찾을 수 없습니다.');
     }
 
     const allowedFields = [
@@ -364,7 +364,7 @@ router.patch('/:id', async (req: Request, res: Response, next: NextFunction) => 
     }
 
     if (updates.length === 0) {
-      throw new AppError(400, 'No fields to update');
+      throw new AppError(400, '수정할 항목이 없습니다.');
     }
 
     const now = new Date();
@@ -410,10 +410,10 @@ router.patch('/:id', async (req: Request, res: Response, next: NextFunction) => 
  */
 router.delete('/:id', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    if (!req.user) throw new AppError(401, 'Authentication required');
+    if (!req.user) throw new AppError(401, '로그인이 필요합니다.');
 
     const id = Number(req.params.id);
-    if (Number.isNaN(id)) throw new AppError(400, 'Invalid ticket id');
+    if (Number.isNaN(id)) throw new AppError(400, '올바르지 않은 티켓 ID입니다.');
 
     const existing = await query<{ id: number }>(
       'SELECT id FROM tickets WHERE id = $1',
@@ -421,7 +421,7 @@ router.delete('/:id', async (req: Request, res: Response, next: NextFunction) =>
     );
 
     if (existing.rows.length === 0) {
-      throw new AppError(404, 'Ticket not found');
+      throw new AppError(404, '티켓을 찾을 수 없습니다.');
     }
 
     await query('DELETE FROM tickets WHERE id = $1', [id]);
