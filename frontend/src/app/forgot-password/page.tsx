@@ -5,10 +5,8 @@ import { FormEvent, useState } from 'react';
 import { apiFetch } from '@/lib/api';
 import styles from '@/styles/shared.module.css';
 
-export default function SignupPage() {
-  const [name, setName] = useState('');
+export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
@@ -20,13 +18,13 @@ export default function SignupPage() {
     setLoading(true);
 
     try {
-      const data = await apiFetch<{ message: string }>('/api/auth/signup', {
+      const data = await apiFetch<{ message: string }>('/api/auth/forgot-password', {
         method: 'POST',
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ email }),
       });
       setMessage(data.message);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '회원가입에 실패했습니다.');
+      setError(err instanceof Error ? err.message : '요청에 실패했습니다.');
     } finally {
       setLoading(false);
     }
@@ -34,20 +32,11 @@ export default function SignupPage() {
 
   return (
     <div className={styles.card}>
-      <h1 className={styles.title}>회원가입</h1>
-      <p className={styles.subtitle}>이메일 인증 후 계정이 활성화됩니다</p>
+      <h1 className={styles.title}>비밀번호 재설정</h1>
+      <p className={styles.subtitle}>가입한 이메일로 재설정 링크를 보냅니다</p>
       <form className={styles.form} onSubmit={handleSubmit}>
         {error && <div className={styles.error}>{error}</div>}
         {message && <div className={styles.success}>{message}</div>}
-        <div className={styles.field}>
-          <label htmlFor="name">이름</label>
-          <input
-            id="name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-        </div>
         <div className={styles.field}>
           <label htmlFor="email">이메일</label>
           <input
@@ -58,23 +47,12 @@ export default function SignupPage() {
             required
           />
         </div>
-        <div className={styles.field}>
-          <label htmlFor="password">비밀번호 (6자 이상)</label>
-          <input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            minLength={6}
-            required
-          />
-        </div>
         <button type="submit" className={styles.button} disabled={loading}>
-          {loading ? '가입 중...' : '회원가입'}
+          {loading ? '전송 중...' : '재설정 메일 보내기'}
         </button>
       </form>
       <p className={styles.linkRow}>
-        이미 계정이 있으신가요? <Link href="/login">로그인</Link>
+        <Link href="/login">로그인으로 돌아가기</Link>
       </p>
     </div>
   );

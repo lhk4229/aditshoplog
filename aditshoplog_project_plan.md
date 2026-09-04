@@ -61,8 +61,9 @@ Aditshoplog는 구글시트로 관리하던 업무 티켓 처리 현황을 웹 �
 
 ### 인증 기능
 
-- 회원가입
-- 로그인
+- 회원가입 (인증 메일 링크 확인 후 활성화)
+- 로그인 (이메일 미인증 계정은 거부)
+- 비밀번호 재설정 (메일 링크)
 - 로그아웃 (`POST /api/auth/logout` — httpOnly Cookie 삭제)
 - JWT 기반 인증 (httpOnly Cookie, JavaScript 접근 불가)
 - 로그인 상태 유지
@@ -109,6 +110,9 @@ Aditshoplog는 구글시트로 관리하던 업무 티켓 처리 현황을 웹 �
 | `/` | 메인 또는 티켓 목록으로 redirect |
 | `/login` | 로그인 페이지 |
 | `/signup` | 회원가입 페이지 |
+| `/verify-email` | 이메일 인증 |
+| `/forgot-password` | 비밀번호 재설정 요청 |
+| `/reset-password` | 새 비밀번호 입력 |
 | `/tickets` | 티켓 목록 페이지 |
 | `/tickets/new` | 티켓 등록 페이지 |
 | `/tickets/[id]` | 티켓 상세 페이지 |
@@ -185,6 +189,19 @@ Aditshoplog는 구글시트로 관리하던 업무 티켓 처리 현황을 웹 �
 | name | VARCHAR NOT NULL | 표시 이름 |
 | created_at | TIMESTAMP | 생성일 |
 | updated_at | TIMESTAMP | 수정일 |
+| email_verified_at | TIMESTAMP | 이메일 인증 시각 (NULL이면 미인증) |
+
+### email_tokens 테이블
+
+| 컬럼명 | 타입 | 설명 |
+|--------|------|------|
+| id | SERIAL PRIMARY KEY | 토큰 ID |
+| user_id | INTEGER NOT NULL | 대상 사용자 (FK → users.id) |
+| purpose | VARCHAR | verify_email / reset_password |
+| token_hash | VARCHAR | 원문 토큰의 SHA-256 |
+| expires_at | TIMESTAMP | 만료 시각 (30분) |
+| used_at | TIMESTAMP | 사용 시각 |
+| created_at | TIMESTAMP | 생성일 |
 
 ### tickets 테이블
 

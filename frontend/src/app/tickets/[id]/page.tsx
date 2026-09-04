@@ -115,14 +115,16 @@ export default function TicketDetailPage() {
     <div>
       <div className={styles.pageHeader}>
         <h1>{ticket.title}</h1>
-        <div className={styles.actions}>
-          <Link href={`/tickets/${id}/edit`} className={styles.buttonSecondary}>
-            수정
-          </Link>
-          <button type="button" className={styles.buttonDanger} onClick={handleDeleteTicket}>
-            삭제
-          </button>
-        </div>
+        {currentUser?.id === ticket.writer_id && (
+          <div className={styles.actions}>
+            <Link href={`/tickets/${id}/edit`} className={styles.buttonSecondary}>
+              수정
+            </Link>
+            <button type="button" className={styles.buttonDanger} onClick={handleDeleteTicket}>
+              삭제
+            </button>
+          </div>
+        )}
       </div>
 
       <div className={styles.detailGrid}>

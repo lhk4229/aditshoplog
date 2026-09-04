@@ -321,13 +321,19 @@ router.patch('/:id', async (req: Request, res: Response, next: NextFunction) => 
     const id = Number(req.params.id);
     if (Number.isNaN(id)) throw new AppError(400, '올바르지 않은 티켓 ID입니다.');
 
-    const existing = await query<{ id: number; jira_key: string; ticket_name: string }>(
-      'SELECT id, jira_key, ticket_name FROM tickets WHERE id = $1',
-      [id]
-    );
+    const existing = await query<{
+      id: number;
+      jira_key: string;
+      ticket_name: string;
+      writer_id: number;
+    }>('SELECT id, jira_key, ticket_name, writer_id FROM tickets WHERE id = $1', [id]);
 
     if (existing.rows.length === 0) {
       throw new AppError(404, '티켓을 찾을 수 없습니다.');
+    }
+
+    if (existing.rows[0].writer_id !== req.user.userId) {
+      throw new AppError(403, '본인이 작성한 티켓만 수정할 수 있습니다.');
     }
 
     const allowedFields = [
@@ -396,7 +402,7 @@ router.patch('/:id', async (req: Request, res: Response, next: NextFunction) => 
  * /api/tickets/{id}:
  *   delete:
  *     tags: [Tickets]
- *     summary: 티켓 삭제 (로그인 사용자)
+ *     summary: 티켓 삭제 (작성자만)
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -415,13 +421,17 @@ router.delete('/:id', async (req: Request, res: Response, next: NextFunction) =>
     const id = Number(req.params.id);
     if (Number.isNaN(id)) throw new AppError(400, '올바르지 않은 티켓 ID입니다.');
 
-    const existing = await query<{ id: number }>(
-      'SELECT id FROM tickets WHERE id = $1',
+    const existing = await query<{ id: number; writer_id: number }>(
+      'SELECT id, writer_id FROM tickets WHERE id = $1',
       [id]
     );
 
     if (existing.rows.length === 0) {
       throw new AppError(404, '티켓을 찾을 수 없습니다.');
+    }
+
+    if (existing.rows[0].writer_id !== req.user.userId) {
+      throw new AppError(403, '본인이 작성한 티켓만 삭제할 수 있습니다.');
     }
 
     await query('DELETE FROM tickets WHERE id = $1', [id]);

@@ -41,4 +41,14 @@ export const env = {
   corsOrigin: parseCorsOrigins(),
   cookieSecure: parseCookieSecure(),
   nodeEnv: process.env.NODE_ENV ?? 'development',
+  appUrl: (process.env.APP_URL ?? 'http://localhost:3000').replace(/\/$/, ''),
+  smtpHost: process.env.SMTP_HOST ?? '',
+  smtpPort: Number(process.env.SMTP_PORT ?? 587),
+  smtpSecure: process.env.SMTP_SECURE?.trim().toLowerCase() === 'true',
+  smtpUser: process.env.SMTP_USER ?? '',
+  smtpPass: process.env.SMTP_PASS ?? '',
+  mailFrom: process.env.MAIL_FROM || 'Aditshoplog <noreply@localhost>',
+  smtpTlsInsecure:
+    process.env.SMTP_TLS_INSECURE?.trim().toLowerCase() === 'true' ||
+    (process.env.NODE_ENV ?? 'development') !== 'production',
 };

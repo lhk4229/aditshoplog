@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { FormEvent, useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { apiFetch } from '@/lib/api';
+import { apiFetch, fetchCurrentUser } from '@/lib/api';
 import { toDateInputValue } from '@/lib/date';
 import {
   CAPTURE_UPLOAD_OPTIONS,
@@ -26,7 +26,16 @@ export default function EditTicketPage() {
   useEffect(() => {
     async function loadTicket() {
       try {
-        const ticket = await apiFetch<Ticket>(`/api/tickets/${id}`);
+        const [ticket, user] = await Promise.all([
+          apiFetch<Ticket>(`/api/tickets/${id}`),
+          fetchCurrentUser(),
+        ]);
+
+        if (!user || user.id !== ticket.writer_id) {
+          router.replace(`/tickets/${id}`);
+          return;
+        }
+
         setForm({
           jira_key: ticket.jira_key,
           ticket_name: ticket.ticket_name,
@@ -47,7 +56,7 @@ export default function EditTicketPage() {
     }
 
     if (!Number.isNaN(id)) loadTicket();
-  }, [id]);
+  }, [id, router]);
 
   function updateField(key: string, value: string) {
     setForm((prev) => ({ ...prev, [key]: value }));

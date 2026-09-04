@@ -2,13 +2,14 @@
 
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
-import { apiFetch } from '@/lib/api';
+import { apiFetch, fetchCurrentUser, type AuthUser } from '@/lib/api';
 import { TICKET_STATUS_OPTIONS } from '@/constants/ticketOptions';
 import { formatDate, formatDateTime, type TicketListResponse } from '@/types/ticket';
 import styles from '@/styles/shared.module.css';
 
 export default function TicketsPage() {
   const [data, setData] = useState<TicketListResponse | null>(null);
+  const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
   const [error, setError] = useState('');
   const [page, setPage] = useState(1);
   const [filters, setFilters] = useState({
@@ -36,6 +37,10 @@ export default function TicketsPage() {
   useEffect(() => {
     loadTickets();
   }, [loadTickets]);
+
+  useEffect(() => {
+    fetchCurrentUser().then(setCurrentUser);
+  }, []);
 
   async function handleDelete(id: number) {
     if (!confirm('이 티켓을 삭제하시겠습니까?')) return;
@@ -150,18 +155,22 @@ export default function TicketsPage() {
                     : '-'}
                 </td> */}
                 <td>
-                  <div className={styles.actions}>
-                    <Link href={`/tickets/${ticket.id}/edit`} className={styles.linkButton}>
-                      수정
-                    </Link>
-                    <button
-                      type="button"
-                      className={styles.dangerButton}
-                      onClick={() => handleDelete(ticket.id)}
-                    >
-                      삭제
-                    </button>
-                  </div>
+                  {currentUser?.id === ticket.writer_id ? (
+                    <div className={styles.actions}>
+                      <Link href={`/tickets/${ticket.id}/edit`} className={styles.linkButton}>
+                        수정
+                      </Link>
+                      <button
+                        type="button"
+                        className={styles.dangerButton}
+                        onClick={() => handleDelete(ticket.id)}
+                      >
+                        삭제
+                      </button>
+                    </div>
+                  ) : (
+                    '-'
+                  )}
                 </td>
               </tr>
             ))}

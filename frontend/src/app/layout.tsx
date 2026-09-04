@@ -1,14 +1,14 @@
 import './globals.css';
 import styles from './layout.module.css';
 import type { Metadata } from 'next';
-import { Noto_Sans_KR } from 'next/font/google';
+import localFont from 'next/font/local';
 import { Header } from '@/components/Header';
 
-const notoSansKr = Noto_Sans_KR({
-  subsets: ['latin'],
-  weight: ['400', '500', '700'],
+const notoSansKr = localFont({
+  src: './fonts/NotoSansKR-Variable.ttf',
   variable: '--font-noto-sans',
   display: 'swap',
+  weight: '100 900',
 });
 
 export const metadata: Metadata = {

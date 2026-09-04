@@ -176,13 +176,23 @@
 }
 
 /* ── Feedback ── */
-.error {
+.error,
+.success {
   padding: 10px 14px;
   border-radius: var(--nw-radius);
+  font-size: 13px;
+}
+
+.error {
   border: 1px solid #f5c6c4;
   background: var(--nw-red-light);
   color: var(--nw-red);
-  font-size: 13px;
+}
+
+.success {
+  border: 1px solid #c6e6c8;
+  background: #f3faf3;
+  color: #2d6a32;
 }
 
 .linkRow {
