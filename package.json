@@ -5,7 +5,7 @@
     "dev": "concurrently -n backend,frontend -c blue,green \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\"",
     "dev:backend": "npm run dev --prefix backend",
     "dev:frontend": "npm run dev --prefix frontend",
-    "db:up": "docker compose up -d postgres mailpit",
+    "db:up": "docker compose up -d postgres adminer",
     "db:down": "docker compose down",
     "db:migrate": "npm run migrate --prefix backend",
     "prod:up": "docker compose -f docker-compose.prod.yml --env-file .env up -d --build",
