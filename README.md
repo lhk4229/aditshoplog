@@ -85,6 +85,8 @@ npm run dev:frontend
 
 Adminer 접속 시 서버는 `postgres`, 계정/DB는 `.env`의 `POSTGRES_*` 값을 사용합니다.
 
+Adminer는 로컬 개발 편의용이며 `docker-compose.yml`에만 포함됩니다. 프로덕션(`docker-compose.prod.yml`)에는 배포되지 않으며, 서버 DB는 SSH로 접속해 `docker compose -f docker-compose.prod.yml exec postgres psql`로 확인합니다.
+
 회원가입 시 인증 메일이 필요합니다. SMTP가 비어 있으면 메일 발송이 실패하므로 로컬에서도 설정해야 합니다. 메일 링크의 베이스 URL은 `APP_URL`입니다.
 
 발송에는 Gmail SMTP를 사용합니다. 구글 계정에 2단계 인증을 켜고 [앱 비밀번호](https://myaccount.google.com/apppasswords)를 발급받아 `SMTP_PASS`에 넣으세요. `SMTP_USER`와 `MAIL_FROM`은 같은 지메일 주소여야 합니다.
