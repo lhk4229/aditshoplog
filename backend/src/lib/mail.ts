@@ -1,9 +1,55 @@
 import nodemailer from 'nodemailer';
+import type { Transporter } from 'nodemailer';
 import { env } from '../config/env';
 import { AppError } from '../middleware/errorHandler';
 
 const lastSentAt = new Map<string, number>();
 const RESEND_COOLDOWN_MS = 60 * 1000;
+
+function mailFromAddress(): string {
+  const from = env.mailFrom.trim();
+  if (!from) {
+    return from;
+  }
+  return from.includes('<') ? from : `Aditshoplog <${from}>`;
+}
+
+export function isSmtpConfigured(): boolean {
+  return Boolean(env.smtpHost && env.smtpUser && env.smtpPass && env.mailFrom);
+}
+
+function assertSmtpConfigured(): void {
+  if (!env.smtpHost || !env.smtpUser || !env.smtpPass || !env.mailFrom) {
+    throw new AppError(
+      500,
+      'SMTP 설정이 없어 메일을 보낼 수 없습니다. SMTP_HOST, SMTP_USER, SMTP_PASS, MAIL_FROM을 확인하고 서버를 재시작해 주세요.'
+    );
+  }
+}
+
+let transporter: Transporter | null = null;
+
+function getTransporter(): Transporter {
+  assertSmtpConfigured();
+  if (!transporter) {
+    transporter = nodemailer.createTransport({
+      host: env.smtpHost,
+      port: env.smtpPort,
+      secure: env.smtpSecure,
+      auth: { user: env.smtpUser, pass: env.smtpPass },
+      requireTLS: env.smtpPort === 587,
+      tls: { rejectUnauthorized: !env.smtpTlsInsecure },
+    });
+  }
+  return transporter;
+}
+
+export async function verifySmtp(): Promise<void> {
+  if (!isSmtpConfigured()) {
+    throw new Error('SMTP is not configured');
+  }
+  await getTransporter().verify();
+}
 
 export function assertNotRateLimited(key: string): void {
   const previous = lastSentAt.get(key);
@@ -38,36 +84,21 @@ function linkMailHtml(body: string, url: string, actionLabel: string): string {
 }
 
 async function sendMail(to: string, subject: string, text: string, html: string): Promise<void> {
-  if (!env.smtpHost) {
-    return;
-  }
-
-  if (!env.smtpUser || !env.smtpPass || !env.mailFrom) {
-    throw new AppError(
-      500,
-      'SMTP_USER, SMTP_PASS, MAIL_FROM을 .env에 설정한 뒤 서버를 재시작해 주세요.'
-    );
-  }
-
-  const transporter = nodemailer.createTransport({
-    host: env.smtpHost,
-    port: env.smtpPort,
-    secure: env.smtpSecure,
-    auth: { user: env.smtpUser, pass: env.smtpPass },
-    tls: { rejectUnauthorized: !env.smtpTlsInsecure },
-  });
+  assertSmtpConfigured();
 
   try {
-    await transporter.sendMail({
-      from: env.mailFrom,
+    const info = await getTransporter().sendMail({
+      from: mailFromAddress(),
       to,
       subject,
       text,
       html,
     });
+    console.log(`[mail] sent ${subject} to=${to} id=${info.messageId ?? '-'} response=${info.response ?? '-'}`);
   } catch (error) {
-    console.error('[mail] send failed:', error);
-    throw new AppError(502, '인증 메일 발송에 실패했습니다. SMTP 설정과 발신 주소 인증을 확인해 주세요.');
+    const err = error as { message?: string; response?: string; responseCode?: number };
+    console.error('[mail] send failed:', err.response ?? err.message ?? error);
+    throw new AppError(502, '메일 발송에 실패했습니다. SMTP 설정과 발신 주소 인증을 확인해 주세요.');
   }
 }
 

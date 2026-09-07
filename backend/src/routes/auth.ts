@@ -233,6 +233,8 @@ router.post('/forgot-password', async (req: Request, res: Response, next: NextFu
       const token = await issueEmailToken(user.id, 'reset_password');
       await sendPasswordResetEmail(user.email, token);
       markSent(`reset:${email}`);
+    } else {
+      console.warn('[mail] skip password reset: user missing or email not verified');
     }
 
     res.json({
