@@ -6,6 +6,15 @@
 
 더 자세한 기획은 [aditshoplog_project_plan.md](./aditshoplog_project_plan.md)를 참고하세요.
 
+## 배포 주소
+
+AWS EC2에 배포되어 있으며, main 브랜치에 푸시하면 GitHub Actions가 자동으로 재배포합니다.
+
+| 서비스 | 주소 |
+|--------|------|
+| 서비스 | http://15.164.211.3 |
+| Swagger | http://15.164.211.3/api-docs |
+
 ## 기술 스택
 
 | 구분 | 기술 |
@@ -127,7 +136,9 @@ npm run prod:up
 
 `docker-compose.prod.yml`이 postgres, backend, frontend, nginx를 올립니다. nginx가 80 포트로 프론트와 `/api`를 프록시합니다.
 
-배포 파이프라인은 `.github/workflows/`의 CI와 AWS SSH 배포 워크플로를 사용합니다.
+배포 파이프라인은 `.github/workflows/`의 CI와 AWS SSH 배포 워크플로를 사용합니다. main 브랜치 푸시 시 `ci.yml`이 타입 체크와 도커 빌드를 검증하고, `deploy-aws.yml`이 EC2에 SSH로 접속해 최신 코드를 받아 컨테이너를 다시 빌드·기동합니다.
+
+EC2 초기 설정은 `deploy/setup-server.sh`가 담당합니다. 도커 설치, 배포용 SSH 키 생성, `.env` 템플릿 복사까지 처리하며, 출력된 공개키를 GitHub Deploy keys에 등록해야 서버가 저장소를 받아올 수 있습니다.
 
 ## 디렉터리 구조
 
