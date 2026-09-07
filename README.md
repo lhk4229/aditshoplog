@@ -76,7 +76,11 @@ npm run dev:frontend
 
 Adminer 접속 시 서버는 `postgres`, 계정/DB는 `.env`의 `POSTGRES_*` 값을 사용합니다.
 
-회원가입 시 인증 메일이 필요합니다. SMTP가 비어 있으면 메일 발송이 실패하므로, 로컬에서도 Brevo 등 SMTP를 설정하세요. 메일 링크의 베이스 URL은 `APP_URL`입니다.
+회원가입 시 인증 메일이 필요합니다. SMTP가 비어 있으면 메일 발송이 실패하므로 로컬에서도 설정해야 합니다. 메일 링크의 베이스 URL은 `APP_URL`입니다.
+
+발송에는 Gmail SMTP를 사용합니다. 구글 계정에 2단계 인증을 켜고 [앱 비밀번호](https://myaccount.google.com/apppasswords)를 발급받아 `SMTP_PASS`에 넣으세요. `SMTP_USER`와 `MAIL_FROM`은 같은 지메일 주소여야 합니다.
+
+외부 발송 서비스(Brevo, SendGrid 등)로 지메일 주소를 발신자로 쓰면 SPF/DKIM이 정렬되지 않아 회사 메일 서버에서 격리될 수 있습니다. 구글 서버로 직접 보내면 이 문제가 없습니다.
 
 ## 주요 npm 스크립트
 
@@ -104,7 +108,7 @@ Adminer 접속 시 서버는 `postgres`, 계정/DB는 `.env`의 `POSTGRES_*` 값
 | `JWT_SECRET` / `JWT_EXPIRES_IN` | JWT 서명·만료 |
 | `CORS_ORIGIN` | 허용 Origin (콤마 구분 가능) |
 | `APP_URL` | 인증·비밀번호 재설정 메일 링크 |
-| `SMTP_*` / `MAIL_FROM` | 메일 발송 (Brevo SMTP) |
+| `SMTP_*` / `MAIL_FROM` | 메일 발송 (Gmail SMTP, `SMTP_PASS`는 앱 비밀번호) |
 | `NEXT_PUBLIC_API_URL` | 프론트 API 베이스. 로컬은 `http://localhost:4000`, nginx 동일 origin 배포는 빈 값 |
 | `COOKIE_SECURE` | 선택. 미설정 시 `APP_URL`/`CORS_ORIGIN`이 `https://`이면 Secure 쿠키 |
 
