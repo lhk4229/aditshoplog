@@ -21,8 +21,8 @@ services:
       context: ./backend
     container_name: aditshoplog-api
     restart: unless-stopped
-    ports:
-      - "4000:4000"
+    expose:
+      - "4000"
     env_file:
       - .env
     environment:
