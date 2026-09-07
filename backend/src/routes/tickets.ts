@@ -78,32 +78,46 @@ const ticketSelect = `
  *     tags: [Tickets]
  *     summary: 티켓 목록 (페이징·필터)
  *     security:
+ *       - cookieAuth: []
  *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: page
- *         schema: { type: integer, default: 1 }
+ *         description: 1부터 시작하는 페이지 번호
+ *         schema: { type: integer, minimum: 1, default: 1 }
  *       - in: query
  *         name: limit
- *         schema: { type: integer, default: 20 }
+ *         description: 페이지당 건수 (최대 100)
+ *         schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
  *       - in: query
  *         name: jira_key
+ *         description: 부분 일치 검색
  *         schema: { type: string }
  *       - in: query
  *         name: ticket_name
+ *         description: 부분 일치 검색
  *         schema: { type: string }
  *       - in: query
  *         name: status
+ *         description: 정확히 일치
  *         schema: { type: string }
  *       - in: query
  *         name: assignee
+ *         description: 부분 일치 검색
  *         schema: { type: string }
  *       - in: query
  *         name: deploy_date
+ *         description: 정확히 일치 (YYYY-MM-DD)
  *         schema: { type: string, format: date }
  *     responses:
  *       200:
  *         description: 티켓 목록
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/TicketListResponse'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
  */
 router.get('/', async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -188,11 +202,27 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
  *   post:
  *     tags: [Tickets]
  *     summary: 티켓 등록
+ *     description: 로그인한 사용자만 등록할 수 있으며, 작성자는 토큰의 사용자로 지정됩니다.
  *     security:
+ *       - cookieAuth: []
  *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/TicketCreateRequest'
  *     responses:
  *       201:
  *         description: 등록 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Ticket'
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
  */
 router.post('/', async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -267,6 +297,7 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
  *     tags: [Tickets]
  *     summary: 티켓 상세
  *     security:
+ *       - cookieAuth: []
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
@@ -276,6 +307,16 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
  *     responses:
  *       200:
  *         description: 티켓 상세
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Ticket'
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
  */
 router.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -302,17 +343,36 @@ router.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
  * /api/tickets/{id}:
  *   patch:
  *     tags: [Tickets]
- *     summary: 티켓 수정
+ *     summary: 티켓 수정 (작성자만)
  *     security:
+ *       - cookieAuth: []
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
  *         schema: { type: integer }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/TicketUpdateRequest'
  *     responses:
  *       200:
  *         description: 수정 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Ticket'
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
  */
 router.patch('/:id', async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -403,7 +463,9 @@ router.patch('/:id', async (req: Request, res: Response, next: NextFunction) => 
  *   delete:
  *     tags: [Tickets]
  *     summary: 티켓 삭제 (작성자만)
+ *     description: 티켓을 삭제하면 딸린 리마크도 함께 삭제됩니다.
  *     security:
+ *       - cookieAuth: []
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
@@ -413,6 +475,14 @@ router.patch('/:id', async (req: Request, res: Response, next: NextFunction) => 
  *     responses:
  *       204:
  *         description: 삭제 성공
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
  */
 router.delete('/:id', async (req: Request, res: Response, next: NextFunction) => {
   try {

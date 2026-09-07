@@ -25,7 +25,14 @@ app.get('/health', async (_req, res) => {
   }
 });
 
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use(
+  '/api-docs',
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerSpec, {
+    // 인증이 httpOnly 쿠키 기반이라, Try it out에서 쿠키를 함께 보내야 로그인 후 호출이 된다.
+    swaggerOptions: { withCredentials: true, persistAuthorization: true },
+  })
+);
 app.get('/api-docs.json', (_req, res) => {
   res.json(swaggerSpec);
 });

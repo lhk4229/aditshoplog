@@ -36,6 +36,7 @@ function mapRemark(row: RemarkRow) {
  *     tags: [Remarks]
  *     summary: 리마크 목록
  *     security:
+ *       - cookieAuth: []
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
@@ -44,7 +45,17 @@ function mapRemark(row: RemarkRow) {
  *         schema: { type: integer }
  *     responses:
  *       200:
- *         description: 리마크 목록
+ *         description: 리마크 목록 (작성순)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/RemarkListResponse'
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
  */
 router.get(
   '/tickets/:ticketId/remarks',
@@ -81,15 +92,32 @@ router.get(
  *     tags: [Remarks]
  *     summary: 리마크 작성
  *     security:
+ *       - cookieAuth: []
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: ticketId
  *         required: true
  *         schema: { type: integer }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/RemarkRequest'
  *     responses:
  *       201:
  *         description: 작성 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Remark'
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
  */
 router.post(
   '/tickets/:ticketId/remarks',
@@ -136,15 +164,34 @@ router.post(
  *     tags: [Remarks]
  *     summary: 리마크 수정 (본인만)
  *     security:
+ *       - cookieAuth: []
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
  *         schema: { type: integer }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/RemarkRequest'
  *     responses:
  *       200:
  *         description: 수정 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Remark'
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
  */
 router.patch('/remarks/:id', async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -197,6 +244,7 @@ router.patch('/remarks/:id', async (req: Request, res: Response, next: NextFunct
  *     tags: [Remarks]
  *     summary: 리마크 삭제 (본인만)
  *     security:
+ *       - cookieAuth: []
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
@@ -206,6 +254,14 @@ router.patch('/remarks/:id', async (req: Request, res: Response, next: NextFunct
  *     responses:
  *       204:
  *         description: 삭제 성공
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         $ref: '#/components/responses/Forbidden'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
  */
 router.delete('/remarks/:id', async (req: Request, res: Response, next: NextFunction) => {
   try {

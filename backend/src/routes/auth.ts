@@ -37,20 +37,24 @@ function loginUser(res: Response, user: Pick<UserRow, 'id' | 'email' | 'name'>) 
  *   post:
  *     tags: [Auth]
  *     summary: 회원가입 (인증 메일 발송)
+ *     description: 이메일 중복을 검사하고 비밀번호를 bcrypt로 해싱해 저장한 뒤, 인증 메일을 보냅니다. 인증을 마치지 않은 이메일은 재가입으로 덮어씁니다.
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required: [email, password, name]
- *             properties:
- *               email: { type: string }
- *               password: { type: string }
- *               name: { type: string }
+ *             $ref: '#/components/schemas/SignupRequest'
  *     responses:
  *       201:
  *         description: 인증 메일 발송
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Message'
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       409:
+ *         $ref: '#/components/responses/Conflict'
  */
 router.post('/signup', async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -124,18 +128,22 @@ router.post('/signup', async (req: Request, res: Response, next: NextFunction) =
  *   post:
  *     tags: [Auth]
  *     summary: 이메일 인증
+ *     description: 인증 메일 링크의 토큰을 확인하고, 성공 시 로그인 쿠키를 발급합니다.
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required: [token]
- *             properties:
- *               token: { type: string }
+ *             $ref: '#/components/schemas/VerifyEmailRequest'
  *     responses:
  *       200:
  *         description: 인증 성공 후 로그인
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AuthResponse'
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
  */
 router.post('/verify-email', async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -174,6 +182,22 @@ router.post('/verify-email', async (req: Request, res: Response, next: NextFunct
  *   post:
  *     tags: [Auth]
  *     summary: 인증 메일 재발송
+ *     description: 미인증 계정에만 실제로 발송하며, 계정 존재 여부는 응답으로 드러내지 않습니다. 60초 재발송 제한이 있습니다.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/EmailRequest'
+ *     responses:
+ *       200:
+ *         description: 발송 요청 접수
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Message'
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
  */
 router.post(
   '/resend-verification',
@@ -213,6 +237,22 @@ router.post(
  *   post:
  *     tags: [Auth]
  *     summary: 비밀번호 재설정 메일 발송
+ *     description: 이메일 인증을 마친 계정에만 실제로 발송하며, 계정 존재 여부는 응답으로 드러내지 않습니다.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/EmailRequest'
+ *     responses:
+ *       200:
+ *         description: 발송 요청 접수
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Message'
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
  */
 router.post('/forgot-password', async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -251,6 +291,22 @@ router.post('/forgot-password', async (req: Request, res: Response, next: NextFu
  *   post:
  *     tags: [Auth]
  *     summary: 비밀번호 재설정
+ *     description: 재설정 메일 링크의 토큰으로 새 비밀번호를 저장하고, 성공 시 바로 로그인시킵니다.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/ResetPasswordRequest'
+ *     responses:
+ *       200:
+ *         description: 재설정 성공 후 로그인
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AuthResponse'
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
  */
 router.post('/reset-password', async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -295,19 +351,30 @@ router.post('/reset-password', async (req: Request, res: Response, next: NextFun
  *   post:
  *     tags: [Auth]
  *     summary: 로그인
+ *     description: 성공 시 httpOnly 쿠키 `aditshoplog_token`을 발급합니다. 이후 Swagger UI에서 인증이 필요한 API를 바로 호출할 수 있습니다.
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required: [email, password]
- *             properties:
- *               email: { type: string }
- *               password: { type: string }
+ *             $ref: '#/components/schemas/LoginRequest'
  *     responses:
  *       200:
  *         description: 로그인 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AuthResponse'
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         description: 이메일 인증 미완료
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  */
 router.post('/login', async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -356,10 +423,17 @@ router.post('/login', async (req: Request, res: Response, next: NextFunction) =>
  *     tags: [Auth]
  *     summary: 현재 로그인 사용자
  *     security:
+ *       - cookieAuth: []
  *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: 사용자 정보
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AuthResponse'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
  */
 router.get('/me', authenticate, async (req: Request, res: Response, next: NextFunction) => {
   try {
